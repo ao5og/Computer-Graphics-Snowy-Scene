@@ -54,9 +54,6 @@ void CMyApp::gen_cylinder(float sections, float thick, float radius, gVertexBuff
 	for (int i = 0; i < sections; i++) {
 		//generate the triangle
 		
-		//std::cout << "index :" << i << " " << angle << " " << radius * cos(angle * i) << " " << radius * sin(angle * i) << ".\n";
-		//std::cout << "   next vertex :" << " " << radius * cos(angle * (i+1)) << " " << radius * sin(angle * (i+1)) << ".\n\n";
-
 		
 		xpos1 = radius * cos(angle * i);
 		ypos1 = radius * sin(angle * i);
@@ -99,12 +96,6 @@ void CMyApp::gen_cylinder(float sections, float thick, float radius, gVertexBuff
 		
 	}
 	}
-
-
-
-
-
-
 
 
 void CMyApp::add_triangle(
@@ -365,23 +356,6 @@ bool CMyApp::Init()
 	//
 
 
-
-	// build a wheel
-	m_wheel.AddAttribute(0, 3); //positions
-	m_wheel.AddAttribute(1, 3); //normals 
-	m_wheel.AddAttribute(2, 2); // tex coords
-
-	float sections  = 100; 
-	float thick = 0.1f;
-	float radius = 0.3f;
-	
-	gen_cylinder(sections, thick, radius, m_wheel);  // testing cylinder 
-
-	m_wheel.InitBuffers();
-
-
-
-
 	 /// 40 by 40 grid
 
 	m_vb.AddAttribute(0, 3); //positions
@@ -455,6 +429,18 @@ bool CMyApp::Init()
 	m_train.InitBuffers();
 
 
+	// build a wheel
+	m_wheel.AddAttribute(0, 3); //positions
+	m_wheel.AddAttribute(1, 3); //normals 
+	m_wheel.AddAttribute(2, 2); // tex coords
+
+	float sections = 100;
+	float thick = 0.1f;
+	float radius = 0.3f;
+
+	gen_cylinder(sections, thick, radius, m_wheel);  // testing cylinder 
+
+	m_wheel.InitBuffers();
 
 
 	//
@@ -530,19 +516,15 @@ void CMyApp::Render()
 	m_program.SetUniform("ground_id", -1);
 	
 	
-
-	// cylinder test 
+	// whole train part
 	
-	m_wheel.On();
-	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
-	m_wheel.Off();
-
-
-	// train part
+	matWorld = glm::mat4(1.0f);
 	
-	
-	matWorld = glm::translate(matWorld, glm::vec3(3.4, 0.75, 0.0));  // position train on (17, 0, 0) or in terms of float (3.4, 0.0, 0.0)
-	matWorld = glm::rotate(matWorld, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0)); // rotate to match rails
+	matWorld = glm::translate(matWorld, glm::vec3(3.4, 0.0, 0.0));
+	matWorld = glm::rotate(matWorld, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));  // rotate to align with rails
+	// train body  part
+
+	matWorld = glm::translate(matWorld, glm::vec3(0.0, 0.55, 0.0));  // elevate 0.3 + 0.25
 	matWorldIT = glm::transpose(glm::inverse(matWorld));
 	mvp = m_camera.GetViewProj() * matWorld;
 
@@ -551,7 +533,7 @@ void CMyApp::Render()
 	m_program.SetUniform("MVP", mvp);
 	m_program.SetUniform("eye_pos", m_camera.GetEye());
 	
-
+	matWorld = glm::translate(matWorld, glm::vec3(0.0, -0.55, 0.0)); // revert body specific translation
 
 	// draw train prisms
 	m_program.SetUniform("train_id", 1);
@@ -560,7 +542,93 @@ void CMyApp::Render()
 	m_train.Off();
 	m_program.SetUniform("train_id", -1);
 	
+	///// draw wheels
 	
+	matWorld = glm::translate(matWorld, glm::vec3(0.0, 0.3, 0.6)); // level with train and attach to side 
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+
+
+	m_program.SetUniform("wheel_id", 1);
+	m_wheel.On();
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+	
+
+	// second wheel  ; spacing will be 0.1 between wheels
+	matWorld = glm::translate(matWorld, glm::vec3(0.7, 0.0, 0.0)); // move on X axis, 0.6 + 0.1 spacing
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+
+
+	// third wheel
+	matWorld = glm::translate(matWorld, glm::vec3(-1.4, 0.0, 0.0)); // move on X axis, to the front
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+	
+	// fourth wheel 
+	matWorld = glm::translate(matWorld, glm::vec3(0.0, 0.0, -1.1)); // move on Z axis
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+
+	//fifth wheel 
+	 
+	matWorld = glm::translate(matWorld, glm::vec3(0.7, 0.0, 0.0)); // move on Z axis
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+
+
+	// sixth wheel 
+	//fifth wheel 
+	matWorld = glm::translate(matWorld, glm::vec3(0.7, 0.0, 0.0)); // move on Z axis
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+
+
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+	m_wheel.Off();
+	m_program.SetUniform("wheel_id", -1);
+
+
+
+
 	m_program.Off();
 
 }

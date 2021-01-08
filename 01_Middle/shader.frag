@@ -17,6 +17,7 @@ out vec4 fs_out_col;
  
  uniform int train_id = -1;
  uniform int ground_id = -1;
+ uniform int wheel_id = -1;
  
 // scene attributes
 
@@ -26,14 +27,17 @@ uniform sampler2D texImage;
 
 void main()
 {
-	fs_out_col = vec4(0.0, 0.0, 0.0, 1.0);
+	fs_out_col = vec4(0.0, 0.6, 0.0, 1.0);
 	if (train_id != -1){
 				fs_out_col = vec4(0.0, 0.0, 0.0, 1.0);
 			} 
-	
+	if (wheel_id != -1){
+		fs_out_col = vec4(0.60, 0.40, 0.12, 1.0);
+		}
 	if (ground_id != -1){
 		fs_out_col = texture(texImage, vs_out_tex0.st);
 		}
+
 
 
 }

@@ -28,12 +28,14 @@ float bigRingOuter = pow(radius_big + rail_width, 2);
 float smallRingInner = pow(radius_small - rail_width, 2);
 float smallRingOuter = pow(radius_small + rail_width, 2);
 
-float yElevation = 0.08; 
+float yElevation = 0.1; 
 
 
 void main()
 {
-	
+	vs_out_pos = (world * vec4(vs_in_pos.x, vs_in_pos.y, vs_in_pos.z, 1)).xyz; 
+				gl_Position = MVP * vec4( vs_in_pos, 1 );
+
 	if (ground_id != -1)
 	{
 		if (( v_loc < smallRingOuter && v_loc > smallRingInner ) || 
@@ -53,8 +55,7 @@ void main()
 				gl_Position = MVP * vec4( vs_in_pos, 1 );
 	}
 
-	vs_out_pos = (world * vec4(vs_in_pos.x, vs_in_pos.y, vs_in_pos.z, 1)).xyz; 
-				gl_Position = MVP * vec4( vs_in_pos, 1 );
+	
 	
 	vs_out_normal  = (worldIT * vec4(vs_in_normal, 0)).xyz;
 	vs_out_tex0 = vs_in_tex0;
