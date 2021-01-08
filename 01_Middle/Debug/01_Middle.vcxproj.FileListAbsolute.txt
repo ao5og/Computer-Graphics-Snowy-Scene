@@ -1,6 +1,0 @@
-C:\Users\aojog\source\repos\CG_Assignment\CG_Assignment\Debug\CG_Assignment.exe
-C:\Users\aojog\source\repos\CG_Assignment\CG_Assignment\Debug\CG_Assignment.pdb
-C:\Users\aojog\source\repos\dsadsad\Debug\CG_Assignment.pdb
-C:\Users\aojog\source\repos\CG_Assignment\Debug\CG_Assignment.pdb
-C:\Users\aojog\source\repos\CG_Assignment\01_Middle\Debug\CG_Assignment.exe
-C:\Users\aojog\source\repos\CG_Assignment\01_Middle\Debug\CG_Assignment.pdb

@@ -47,12 +47,15 @@ protected:
 								const glm::vec3 &P2, 
 								const glm::vec3 &P3, 
 								gVertexBuffer &buffer);
+
+	void gen_prism(float length, float height, float  width, gVertexBuffer& buffer);  // generate prism
 	
 
 	gCamera			m_camera;
 	gShaderProgram	m_program;
 
 	gVertexBuffer	m_vb; // plane
+	gVertexBuffer	m_train; // train
 	
 };
 

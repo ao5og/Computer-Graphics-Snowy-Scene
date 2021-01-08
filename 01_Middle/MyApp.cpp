@@ -69,8 +69,121 @@ void CMyApp::add_triangle(
 
 	//texture coordinates
 	buffer.AddData(2, 0, 0);
-	buffer.AddData(2, 0.5, 1);
-	buffer.AddData(2, 1, 0);
+	buffer.AddData(2, 0, 0);
+	buffer.AddData(2, 0, 0);
+}
+
+void CMyApp::gen_prism(float length, float height, float  width, gVertexBuffer& buffer) {
+
+
+	float frontX = length / 2;  // 0.75
+	float rearX = -length / 2;  // -0.75
+	float topY = height / 2;	// 0.25
+	float bottomY = - height / 2; // -0.25
+	float leftZ = -width / 2; // -0.5f
+	float rightZ = width / 2;  // 0.5f
+
+
+	//top 
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(rearX, topY, leftZ),
+		buffer
+	);
+
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(rearX, topY, leftZ),
+		glm::vec3(rearX, topY, rightZ),
+		buffer
+	); 
+
+	//bottom 
+	add_triangle(
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(rearX, bottomY, leftZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		buffer
+	);
+
+	add_triangle(
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		buffer
+	);
+
+	//front
+	add_triangle(
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		buffer
+	);
+
+
+	//rear
+	add_triangle(
+		glm::vec3(rearX, bottomY, leftZ),
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(rearX, topY, rightZ),
+		buffer
+	);
+
+	 
+	add_triangle(
+		glm::vec3(rearX, bottomY, leftZ),
+		glm::vec3(rearX, topY, rightZ),
+		glm::vec3(rearX, topY, leftZ),
+		buffer
+	);
+
+	// right side
+
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(rearX, topY, rightZ),
+		glm::vec3(rearX, bottomY, rightZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		buffer
+	);
+
+	// left side
+
+	add_triangle(
+		glm::vec3(rearX, topY, leftZ),
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(rearX, topY, leftZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		glm::vec3(rearX, bottomY, leftZ),
+		buffer
+	);
+
+
+
+
 }
 
 bool CMyApp::Init()
@@ -89,7 +202,7 @@ bool CMyApp::Init()
 
 
 
-	 /// plane just a square
+	 /// 40 by 40 grid
 
 	m_vb.AddAttribute(0, 3); //positions
 	m_vb.AddAttribute(1, 3); //normals 
@@ -129,7 +242,28 @@ bool CMyApp::Init()
 		}
 	}
 	m_vb.InitBuffers();
-	
+
+
+	///*******************//
+
+	// TRAIN
+	// prism attributes
+	m_train.AddAttribute(0, 3); //positions
+	m_train.AddAttribute(1, 3); //normals 
+	m_train.AddAttribute(2, 2); // tex coords
+
+	// build lower prism 
+	// sides of prism coordinates
+	float length = 1.5f;
+	float height = 1.0f;
+	float width = 1.0f;
+
+	gen_prism(length, height, width, m_train);   // to test
+
+
+
+	m_train.InitBuffers();
+
 
 
 
@@ -198,11 +332,26 @@ void CMyApp::Render()
 	m_program.SetTexture("texImage", 0, m_textureID);
 
 	// draw with VAO
+	 
+	m_program.SetUniform("ground_id", 1);
 	m_vb.On();
-
 	m_vb.DrawIndexed(GL_TRIANGLES, 0, 9126, 0); //IB
-
 	m_vb.Off();
+	m_program.SetUniform("ground_id", -1);
+	
+	
+	
+	// draw with VAO
+	m_program.SetUniform("train_id", 1);
+	m_train.On();
+	m_train.Draw(GL_TRIANGLES, 0, 36);
+	m_train.Off();
+	m_program.SetUniform("train_id", -1);
+	
+	
+
+
+
 
 
 	m_program.Off();
