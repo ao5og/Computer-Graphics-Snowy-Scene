@@ -73,6 +73,115 @@ void CMyApp::add_triangle(
 	buffer.AddData(2, 0, 0);
 }
 
+
+void CMyApp::gen_prism_offsets(float length, float height, float  width, float offSetX, float offSetY, float offSetZ, gVertexBuffer& buffer) {
+	float frontX = length / 2 + offSetX; 
+	float rearX = -length / 2 + offSetX; 
+	float topY = height / 2 + offSetY;
+	float bottomY = -height / 2 + offSetY;  
+	float leftZ = -width / 2 + offSetZ; 
+	float rightZ = width / 2 + offSetZ;
+
+	//top 
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(rearX, topY, leftZ),
+		buffer
+	);
+
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(rearX, topY, leftZ),
+		glm::vec3(rearX, topY, rightZ),
+		buffer
+	);
+
+	//bottom 
+	add_triangle(
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(rearX, bottomY, leftZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		buffer
+	);
+
+	add_triangle(
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		buffer
+	);
+
+	//front
+	add_triangle(
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		buffer
+	);
+
+
+	//rear
+	add_triangle(
+		glm::vec3(rearX, bottomY, leftZ),
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(rearX, topY, rightZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(rearX, bottomY, leftZ),
+		glm::vec3(rearX, topY, rightZ),
+		glm::vec3(rearX, topY, leftZ),
+		buffer
+	);
+
+	// right side
+
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(rearX, topY, rightZ),
+		glm::vec3(rearX, bottomY, rightZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(frontX, topY, rightZ),
+		glm::vec3(rearX, bottomY, rightZ),
+		glm::vec3(frontX, bottomY, rightZ),
+		buffer
+	);
+
+	// left side
+
+	add_triangle(
+		glm::vec3(rearX, topY, leftZ),
+		glm::vec3(frontX, topY, leftZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		buffer
+	);
+
+
+	add_triangle(
+		glm::vec3(rearX, topY, leftZ),
+		glm::vec3(frontX, bottomY, leftZ),
+		glm::vec3(rearX, bottomY, leftZ),
+		buffer
+	);
+}
+
+
+
 void CMyApp::gen_prism(float length, float height, float  width, gVertexBuffer& buffer) {
 
 
@@ -180,10 +289,6 @@ void CMyApp::gen_prism(float length, float height, float  width, gVertexBuffer& 
 		glm::vec3(rearX, bottomY, leftZ),
 		buffer
 	);
-
-
-
-
 }
 
 bool CMyApp::Init()
@@ -254,12 +359,21 @@ bool CMyApp::Init()
 
 	// build lower prism 
 	// sides of prism coordinates
-	float length = 1.5f;
-	float height = 1.0f;
-	float width = 1.0f;
+	float lengthLow = 1.5f;
+	float heightLow = 0.5f;
+	float widthLow = 1.0f;
 
-	gen_prism(length, height, width, m_train);   // to test
+	gen_prism(lengthLow, heightLow, widthLow, m_train); 
 
+	// build top prism 
+	float lengthTop = 0.5f;
+	float heightTop = 0.25f;
+	float widthTop = 1.0f;
+	float offsetX = (lengthLow - lengthTop) / 2;
+	float offsetY = (heightLow + heightTop) / 2; 
+	float offsetZ = 0.0f;
+
+	gen_prism_offsets(lengthTop, heightTop, widthTop, offsetX, offsetY, offsetZ ,  m_train);
 
 
 	m_train.InitBuffers();
@@ -344,7 +458,7 @@ void CMyApp::Render()
 	// draw with VAO
 	m_program.SetUniform("train_id", 1);
 	m_train.On();
-	m_train.Draw(GL_TRIANGLES, 0, 36);
+	m_train.Draw(GL_TRIANGLES, 0, 36 * 2);
 	m_train.Off();
 	m_program.SetUniform("train_id", -1);
 	

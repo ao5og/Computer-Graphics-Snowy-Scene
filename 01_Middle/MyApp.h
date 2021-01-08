@@ -49,7 +49,7 @@ protected:
 								gVertexBuffer &buffer);
 
 	void gen_prism(float length, float height, float  width, gVertexBuffer& buffer);  // generate prism
-	
+	void gen_prism_offsets(float length, float height, float  width, float offSetX, float offSetY, float offSetZ, gVertexBuffer& buffer);  // generate prism
 
 	gCamera			m_camera;
 	gShaderProgram	m_program;
