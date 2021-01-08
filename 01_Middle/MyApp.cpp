@@ -47,6 +47,65 @@ GLuint CMyApp::GenTexture()
 
 
 
+void CMyApp::gen_cylinder(float sections, float thick, float radius, gVertexBuffer& buffer) {
+	//float angle = 2 * M_PI / sections;
+	float angle = 2.0f * M_PI / sections;
+	float xpos1, ypos1, xpos2, ypos2;
+	for (int i = 0; i < sections; i++) {
+		//generate the triangle
+		
+		//std::cout << "index :" << i << " " << angle << " " << radius * cos(angle * i) << " " << radius * sin(angle * i) << ".\n";
+		//std::cout << "   next vertex :" << " " << radius * cos(angle * (i+1)) << " " << radius * sin(angle * (i+1)) << ".\n\n";
+
+		
+		xpos1 = radius * cos(angle * i);
+		ypos1 = radius * sin(angle * i);
+		xpos2 = radius * cos(angle * (i + 1));
+		ypos2 = radius * sin(angle * (i + 1));
+
+		// one side of the wheel 
+		add_triangle(
+			glm::vec3(0.0, 0.0, 0.0),
+			glm::vec3(xpos1, ypos1, 0.0),
+			glm::vec3(xpos2, ypos2, 0.0),
+			buffer
+		);
+
+		// other side, adding the width of the wheel
+
+		add_triangle(
+			glm::vec3(0.0, 0.0, -thick),
+			glm::vec3(xpos2, ypos2, -thick),
+			glm::vec3(xpos1, ypos1, -thick),
+			buffer
+		);
+
+		// the squares on the side of the wheel 
+		add_triangle(
+			glm::vec3(xpos1, ypos1, -thick),
+			glm::vec3(xpos2, ypos2, -thick),
+			glm::vec3(xpos2, ypos2,  0),
+			buffer
+		);
+
+		add_triangle(
+			glm::vec3(xpos1, ypos1, -thick),
+			glm::vec3(xpos2, ypos2, 0),
+			glm::vec3(xpos1, ypos1, 0),
+			buffer
+		);
+
+		
+		
+	}
+	}
+
+
+
+
+
+
+
 
 void CMyApp::add_triangle(
 	const glm::vec3& P1,
@@ -307,6 +366,22 @@ bool CMyApp::Init()
 
 
 
+	// build a wheel
+	m_wheel.AddAttribute(0, 3); //positions
+	m_wheel.AddAttribute(1, 3); //normals 
+	m_wheel.AddAttribute(2, 2); // tex coords
+
+	float sections  = 100; 
+	float thick = 0.1f;
+	float radius = 0.3f;
+	
+	gen_cylinder(sections, thick, radius, m_wheel);  // testing cylinder 
+
+	m_wheel.InitBuffers();
+
+
+
+
 	 /// 40 by 40 grid
 
 	m_vb.AddAttribute(0, 3); //positions
@@ -318,6 +393,7 @@ bool CMyApp::Init()
 
 	// grid 
 	// id , x, y, z
+
 	int side = 40;
 	float unit = 0.2f;
 	float startX = -4.0f;
@@ -430,7 +506,7 @@ void CMyApp::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// draw square
+	// draw ground
 
 	m_program.On();
 
@@ -445,7 +521,7 @@ void CMyApp::Render()
 
 	m_program.SetTexture("texImage", 0, m_textureID);
 
-	// draw with VAO
+	// draw grid
 	 
 	m_program.SetUniform("ground_id", 1);
 	m_vb.On();
@@ -454,8 +530,30 @@ void CMyApp::Render()
 	m_program.SetUniform("ground_id", -1);
 	
 	
+
+	// cylinder test 
 	
-	// draw with VAO
+	m_wheel.On();
+	m_wheel.Draw(GL_TRIANGLES, 0, 1200);
+	m_wheel.Off();
+
+
+	// train part
+	
+	
+	matWorld = glm::translate(matWorld, glm::vec3(3.4, 0.75, 0.0));  // position train on (17, 0, 0) or in terms of float (3.4, 0.0, 0.0)
+	matWorld = glm::rotate(matWorld, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0)); // rotate to match rails
+	matWorldIT = glm::transpose(glm::inverse(matWorld));
+	mvp = m_camera.GetViewProj() * matWorld;
+
+	m_program.SetUniform("world", matWorld);
+	m_program.SetUniform("worldIT", matWorldIT);
+	m_program.SetUniform("MVP", mvp);
+	m_program.SetUniform("eye_pos", m_camera.GetEye());
+	
+
+
+	// draw train prisms
 	m_program.SetUniform("train_id", 1);
 	m_train.On();
 	m_train.Draw(GL_TRIANGLES, 0, 36 * 2);
@@ -463,11 +561,6 @@ void CMyApp::Render()
 	m_program.SetUniform("train_id", -1);
 	
 	
-
-
-
-
-
 	m_program.Off();
 
 }

@@ -22,14 +22,13 @@ uniform int ground_id = -1;
 float v_loc = pow(vs_in_pos.x, 2) + pow(vs_in_pos.z,2);
 float radius_big = 3.6;  //18 units 
 float radius_small = 3.2;  //16 units
-float rail_width = 0.08;
+float rail_width = 0.04;
 float bigRingInner = pow(radius_big - rail_width, 2);
 float bigRingOuter = pow(radius_big + rail_width, 2);
 float smallRingInner = pow(radius_small - rail_width, 2);
 float smallRingOuter = pow(radius_small + rail_width, 2);
 
-float yElevation = 0.08; // 0.4
-
+float yElevation = 0.08; 
 
 
 void main()
@@ -54,7 +53,8 @@ void main()
 				gl_Position = MVP * vec4( vs_in_pos, 1 );
 	}
 
-
+	vs_out_pos = (world * vec4(vs_in_pos.x, vs_in_pos.y, vs_in_pos.z, 1)).xyz; 
+				gl_Position = MVP * vec4( vs_in_pos, 1 );
 	
 	vs_out_normal  = (worldIT * vec4(vs_in_normal, 0)).xyz;
 	vs_out_tex0 = vs_in_tex0;

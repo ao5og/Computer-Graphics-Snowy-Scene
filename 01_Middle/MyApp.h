@@ -51,11 +51,15 @@ protected:
 	void gen_prism(float length, float height, float  width, gVertexBuffer& buffer);  // generate prism
 	void gen_prism_offsets(float length, float height, float  width, float offSetX, float offSetY, float offSetZ, gVertexBuffer& buffer);  // generate prism
 
+	// for cylinder
+	void CMyApp::gen_cylinder(float sections, float thick, float radius, gVertexBuffer& buffer);
+
 	gCamera			m_camera;
 	gShaderProgram	m_program;
 
 	gVertexBuffer	m_vb; // plane
 	gVertexBuffer	m_train; // train
+	gVertexBuffer	m_wheel; // wheel 
 	
 };
 

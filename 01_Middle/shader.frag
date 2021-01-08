@@ -17,6 +17,7 @@ out vec4 fs_out_col;
  
  uniform int train_id = -1;
  uniform int ground_id = -1;
+ 
 // scene attributes
 
 uniform vec3 eye_pos = vec3(0, 15, 15);
@@ -25,12 +26,14 @@ uniform sampler2D texImage;
 
 void main()
 {
-
+	fs_out_col = vec4(0.0, 0.0, 0.0, 1.0);
 	if (train_id != -1){
 				fs_out_col = vec4(0.0, 0.0, 0.0, 1.0);
 			} 
-			
+	
 	if (ground_id != -1){
 		fs_out_col = texture(texImage, vs_out_tex0.st);
 		}
+
+
 }
